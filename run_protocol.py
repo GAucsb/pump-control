@@ -128,7 +128,7 @@ def run_protocol(
 def stop_pumps():
     from nesp_lib.exceptions import StateException
 
-    with Port("/dev/cu.PL2303G-USBtoUART110") as port:
+    with Port("/dev/cu.PL2303G‑USBtoUART110") as port:
         pump_stock  = Pump(port, address=0)
         pump_buffer = NoVersionPump(port, address=1)
 
