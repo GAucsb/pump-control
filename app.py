@@ -1,8 +1,11 @@
 from flask import Flask, render_template, request
 from run_protocol import run_protocol  
 import subprocess
+from threading import Thread, Event
 
 
+
+stop_event = Event()
 app = Flask(__name__)
 
 
@@ -41,38 +44,31 @@ def run():
         flush_volume   = residence_time * prime_volume             # mL  ← no extra +device_volume
         flush_duration = flush_volume / flush_rate * 60            # sec
 
-        # ── RUN PROTOCOL ─────────────────────────────────────────────────
-        run_protocol(
-            stock_conc      = stock_conc,
-            target_concs    = target_concs,
-            prime_volume    = prime_volume,
-            prime_rate      = prime_rate,
-            prime_duration  = prime_duration,
-            hold_rate       = flow_rate,
-            hold_duration   = hold_duration,
-            flush_rate      = flush_rate,
-            flush_volume    = flush_volume,
-            flush_duration  = flush_duration,
-            syringe_diameter= syringe_diameter,
-            num_stock_pump  = num_stock_pump,
-            num_buffer_pump = num_buffer_pump,
-        )
+        stop_event.clear()
+        Thread(target=run_protocol,args=
+               
+            (stock_conc, target_concs,
+            prime_volume, prime_rate, prime_duration,
+            flow_rate,  hold_duration,
+            flush_rate, flush_volume, flush_duration,
+            syringe_diameter, num_stock_pump, num_buffer_pump),
+            
+            kwargs={"stop_event": stop_event},daemon=True).start()
+        
 
         return "Good"
 
     except Exception as e:
         return f"Error {e}"
     
-from run_protocol import stop_pumps
-
 @app.route("/stop", methods=["GET"])
 def stop():
-    try:
-        stop_pumps()
-        return "<pre>Pumps stopped.</pre>"
-    except Exception as e:
-        return f"<pre>STOP FAILED: {e}</pre>"
+    # flip the flag; run_protocol will see it and stop pumps
+    stop_event.set()
+    return "<pre>Stop signal sent.</pre>"
+
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, threaded=True)
+

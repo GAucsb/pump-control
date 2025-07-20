@@ -22,9 +22,11 @@ def run_protocol(
     flush_duration,
     syringe_diameter,
     num_stock_pump,
-    num_buffer_pump
+    num_buffer_pump,
+    stop_event
 ):
     SECONDS = 60
+    
 
     with Port("/dev/cu.PL2303G-USBtoUART110") as port:
         pump_stock  = Pump(port, address=0)
@@ -36,6 +38,16 @@ def run_protocol(
 
         i = 0
         while i < len(target_concs):
+            
+            if stop_event.is_set():                # NEW
+                try:
+                    pump_stock.stop()
+                    pump_buffer.stop()
+                except StateException: 
+                    pass
+                print("Protocol aborted by user.")
+                return
+         
             conc = target_concs[i]
             f_stock  = conc / stock_conc
             f_buffer = 1 - f_stock
