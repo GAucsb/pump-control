@@ -63,22 +63,16 @@ def run():
     except Exception as e:
         return f"Error {e}"
     
-@app.route("/stop", methods=["GET"])   # ← changed from POST to GET
+from run_protocol import stop_pumps
+
+@app.route("/stop", methods=["GET"])
 def stop():
     try:
-        result = subprocess.run(
-            ["python3", "STOP.py"],
-            check=True,
-            capture_output=True,
-            text=True
-        )
-        # show whatever STOP.py printed
-        return f"<pre>{result.stdout}</pre>"
-    except subprocess.CalledProcessError as e:
-        return (
-            "<pre>STOP FAILED\n\n"
-            f"STDOUT:\n{e.stdout}\n\nSTDERR:\n{e.stderr}</pre>"
-        )
+        stop_pumps()
+        return "<pre>Pumps stopped.</pre>"
+    except Exception as e:
+        return f"<pre>STOP FAILED: {e}</pre>"
+
 
 if __name__ == "__main__":
     app.run(debug=True)
