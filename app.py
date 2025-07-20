@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from testing import run_protocol  # Will update this later to match
+from run_protocol import run_protocol  # Will update this later to match
 
 app = Flask(__name__)
 
@@ -9,8 +9,6 @@ def index():
 
 @app.route("/run", methods=["POST"])
 def run():
-    try:
-        # Parse and clean form inputs
         stock_conc        = float(request.form["stock_conc"])
         target_concs      = [float(c.strip()) for c in request.form["target_concs"].split(",")]
 
@@ -53,12 +51,9 @@ def run():
             num_buffer_pump=num_buffer_pump,
             prime_duration=prime_duration,
             hold_duration = hold_duration,
-            prime_volume=prime_volume,
+            prime_volume=prime_volume
         )
-        return "✅ Protocol ran successfully!"
 
-    except Exception as e:
-        return f"❌ Error: {e}"
-
+        
 if __name__ == "__main__":
     app.run(debug=True)
