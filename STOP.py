@@ -14,7 +14,7 @@ with Port('/dev/tty.PL2303G-USBtoUART110') as port:
     for name, pump in [("Stock", pump_stock), ("Buffer", pump_buffer)]:
         try:
             pump.stop()
-            print(f"✅ {name} pump stopped.")
+            print(f" {name} pump stopped.")
         except StateException:
-            print(f"ℹ️  {name} pump already idle.")
+            print(f" {name} pump already idle.")
 

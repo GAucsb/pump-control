@@ -56,10 +56,10 @@ def run():
             num_buffer_pump = num_buffer_pump,
         )
 
-        return "✅ Protocol ran successfully!"
+        return "Good"
 
     except Exception as e:
-        return f"❌ Error: {e}"
+        return f"Error {e}"
 
 
 if __name__ == "__main__":
