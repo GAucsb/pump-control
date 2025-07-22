@@ -28,7 +28,7 @@ def run_protocol(
     SECONDS = 60
     
 
-    with Port("/dev/cu.PL2303G-USBtoUART110") as port:
+    with Port("COM5") as port:
         pump_stock  = Pump(port, address=0)
         pump_buffer = NoVersionPump(port, address=1)
 
